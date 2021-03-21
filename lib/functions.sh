@@ -3,7 +3,7 @@ function GetChartInfo {
     VERSION=`yq read Chart.yaml -j | jq -r .version`
     NAMESPACE=`yq read Chart.yaml -j | jq -r .namespace`
     REGISTRY=`yq read Chart.yaml -j | jq -r -e .registry`
-    if [[ $? -ne 0 ];
+    if [ $? -ne 0 ];
     then
         REGISTRY=registry.crazyzone.be
     fi
