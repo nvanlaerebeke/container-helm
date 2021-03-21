@@ -66,7 +66,7 @@ function upgrade {
                     exit 1
                 else 
                     echo "Update completed"
-                    helm list -n "$NAMESPACE" -o json -f "$NAME"
+                    helm list -n "$NAMESPACE" -o json -f "$NAME" | jq
                 fi
             else
                 echo "Deployed chart version $DEPLOYED_CHART_VERSION does not match $VERSION, skipping auto update"
