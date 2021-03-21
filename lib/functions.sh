@@ -51,8 +51,8 @@ function upgrade {
         
         if [ "$DEPLOYED_APP_VERSION" == "$APPVERSION" ];
         then
-            local DEPLOYED_CHART_VERSION =`echo $DEPLOYMENT | jq -r '.chart' | awk -F "$NAME-" '{print $2}'`
-            if [ $DEPLOYED_CHART_VERSION == $VERSION ];
+            local DEPLOYED_CHART_VERSION =`echo $DEPLOYMENT | jq -r '.chart' | awk -F ''$NAME-'' '{print $2}'`
+            if [ "$DEPLOYED_CHART_VERSION" == "$VERSION" ];
             then
                 echo "Running auto update"
                 echo helm upgrade --install -n "$NAMESPACE" "$TARGETNAME" .
