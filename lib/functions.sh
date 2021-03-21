@@ -33,50 +33,44 @@ function push {
 
 function upgrade {
     local NAMESPACE=$1
-    if [[ $GIT_LOCAL_BRANCH == "main" || $GIT_LOCAL_BRANCH == "master" ]];
+    GetChartInfo
+    local DEPLOYMENT=`helm list -n "$NAMESPACE" -o json -f "$NAME" | jq '.[]'`
+    if [ $? -ne 0 ];
     then
-        GetChartInfo
-        local DEPLOYMENT=`helm list -n "$NAMESPACE" -o json -f "$NAME" | jq '.[]'`
-        if [ $? -ne 0 ];
-        then
-            echo "Failed getting deployments"
-            exit 1
-        else
-            echo "Found deployment"
-            echo $DEPLOYMENT | jq
-        fi
+        echo "Failed getting deployments"
+        exit 1
+    else
+        echo "Found deployment"
+        echo $DEPLOYMENT | jq
+    fi
 
-        local DEPLOYED_APP_VERSION=`echo $DEPLOYMENT | jq -r '.app_version'`
-        local TARGETNAME=`echo $DEPLOYMENT | jq -r '.name'`
-        
-        if [ "$DEPLOYED_APP_VERSION" == "$APPVERSION" ];
+    local DEPLOYED_APP_VERSION=`echo $DEPLOYMENT | jq -r '.app_version'`
+    local TARGETNAME=`echo $DEPLOYMENT | jq -r '.name'`
+    
+    if [ "$DEPLOYED_APP_VERSION" == "$APPVERSION" ];
+    then
+        local DEPLOYED_CHART=`echo $DEPLOYMENT | jq -r '.chart'`
+        local DEPLOYED_CHART_VERSION=`echo "$DEPLOYED_CHART" | awk -F ''$NAME-'' '{print $2}'`
+        echo "CHART: $DEPLOYED_CHART"
+        echo "VERSION: $DEPLOYED_CHART_VERSION"
+        if [ "$DEPLOYED_CHART_VERSION" == "$VERSION" ];
         then
-            local DEPLOYED_CHART=`echo $DEPLOYMENT | jq -r '.chart'`
-            local DEPLOYED_CHART_VERSION=`echo "$DEPLOYED_CHART" | awk -F ''$NAME-'' '{print $2}'`
-            echo "CHART: $DEPLOYED_CHART"
-            echo "VERSION: $DEPLOYED_CHART_VERSION"
-            if [ "$DEPLOYED_CHART_VERSION" == "$VERSION" ];
+            echo "Running auto update"
+            echo helm upgrade --install -n "$NAMESPACE" "$TARGETNAME" .
+            helm upgrade --install -n "$NAMESPACE" "$TARGETNAME" .
+            if [ $? -ne 0 ];
             then
-                echo "Running auto update"
-                echo helm upgrade --install -n "$NAMESPACE" "$TARGETNAME" .
-                helm upgrade --install -n "$NAMESPACE" "$TARGETNAME" .
-                if [ $? -ne 0 ];
-                then
-                    echo "Failed to upgrade helm chart"
-                    exit 1
-                else 
-                    echo "Update completed"
-                    helm list -n "$NAMESPACE" -o json -f "$NAME" | jq
-                fi
-            else
-                echo "Deployed chart version $DEPLOYED_CHART_VERSION does not match $VERSION, skipping auto update"
+                echo "Failed to upgrade helm chart"
+                exit 1
+            else 
+                echo "Update completed"
+                helm list -n "$NAMESPACE" -o json -f "$NAME" | jq
             fi
         else
-            echo "Deployed app version $DEPLOYED_APP_VERSION does not match $APPVERSION, skipping auto update"
-            return;
+            echo "Deployed chart version $DEPLOYED_CHART_VERSION does not match $VERSION, skipping auto update"
         fi
     else
-        echo "Building from $GIT_LOCAL_BRANCH and the master/main branch, not auto updating"
+        echo "Deployed app version $DEPLOYED_APP_VERSION does not match $APPVERSION, skipping auto update"
         return;
     fi
 }
