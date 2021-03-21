@@ -34,8 +34,7 @@ function upgrade {
     if [[ $GIT_LOCAL_BRANCH == "main" || $GIT_LOCAL_BRANCH == "autoupdate" ]];
     then
         GetChartInfo
-
-        local DEPLOYMENT=`helm list -A -o json  -f "$NAME" | jq`
+        local DEPLOYMENT=`helm list -A -o json -f "$NAME" | jq '.[]'`
         if [ $? -ne 0 ];
         then
             echo "Failed getting deployments"
@@ -47,7 +46,7 @@ function upgrade {
         
         if [ $DEPLOYED_VERSION == $VERSION ];
         then
-            helm upgrade --install --force -n "$TARGETNAMESPACE" "$TARGETNAME" .
+            helm upgrade --install -n "$TARGETNAMESPACE" "$TARGETNAME" .
             if [ $? -ne 0 ];
             then
                 echo "Failed to upgrade helm chart"
