@@ -33,7 +33,7 @@ function push {
 
 function upgrade {
     local NAMESPACE=$1
-    if [[ $GIT_LOCAL_BRANCH == "main" || $GIT_LOCAL_BRANCH == "autoupdate" ]];
+    if [[ $GIT_LOCAL_BRANCH == "main" || $GIT_LOCAL_BRANCH == "master" ]];
     then
         GetChartInfo
         local DEPLOYMENT=`helm list -n "$NAMESPACE" -o json -f "$NAME" | jq '.[]'`
