@@ -9,7 +9,7 @@ push)
   push 
   ;;
 upgrade)
-  upgrade
+  upgrade "$1"
   ;;
 *)
     echo "Please provide an action (push/upgrade)"

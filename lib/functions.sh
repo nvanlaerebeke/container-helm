@@ -31,10 +31,11 @@ function push {
 
 
 function upgrade {
+    local NAMESPACE=$1
     if [[ $GIT_LOCAL_BRANCH == "main" || $GIT_LOCAL_BRANCH == "autoupdate" ]];
     then
         GetChartInfo
-        local DEPLOYMENT=`helm list -A -o json -f "$NAME" | jq '.[]'`
+        local DEPLOYMENT=`helm list -n "$NAMESPACE" -o json -f "$NAME" | jq '.[]'`
         if [ $? -ne 0 ];
         then
             echo "Failed getting deployments"
@@ -42,11 +43,10 @@ function upgrade {
         fi
         local DEPLOYED_VERSION=`echo $DEPLOYMENT | jq -r '.app_version'`
         local TARGETNAME=`echo $DEPLOYMENT | jq -r '.name'`
-        local TARGETNAMESPACE=`echo $DEPLOYMENT | jq -r '.namespace'`
         
         if [ $DEPLOYED_VERSION == $VERSION ];
         then
-            helm upgrade --install -n "$TARGETNAMESPACE" "$TARGETNAME" .
+            helm upgrade --install -n "$NAMESPACE" "$TARGETNAME" .
             if [ $? -ne 0 ];
             then
                 echo "Failed to upgrade helm chart"
