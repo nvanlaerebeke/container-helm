@@ -51,10 +51,10 @@ function upgrade {
         
         if [ "$DEPLOYED_APP_VERSION" == "$APPVERSION" ];
         then
-            local DEPLOYED_CHART_VERSION =`echo $DEPLOYMENT | jq -r '.chart' | awk -F ''$NAME-'' '{print $2}'`
-            echo $DEPLOYMENT | jq -r '.chart'
-            echo "echo DEPLOYMENT | jq -r '.chart' | awk -F ''$NAME-'' '{print $2}'"
-            echo "$DEPLOYED_CHART_VERSION"
+            local DEPLOYED_CHART=`echo $DEPLOYMENT | jq -r '.chart'`
+            local DEPLOYED_CHART_VERSION=`echo "$DEPLOYED_CHART" | awk -F 'web-' '{print $2}'`
+            echo "CHART: $DEPLOYED_CHART"
+            echo "VERSION: $DEPLOYED_CHART_VERSION"
             if [ "$DEPLOYED_CHART_VERSION" == "$VERSION" ];
             then
                 echo "Running auto update"
