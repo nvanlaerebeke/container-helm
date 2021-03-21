@@ -76,7 +76,7 @@ function upgrade {
             return;
         fi
     else
-        echo "Not building the master branch, not auto updating"
+        echo "Building from $GIT_LOCAL_BRANCH and the master/main branch, not auto updating"
         return;
     fi
 }
