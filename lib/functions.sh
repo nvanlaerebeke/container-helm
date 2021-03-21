@@ -1,7 +1,7 @@
 function GetChartInfo {
-    NAME=helm-`yq read Chart.yaml -j | jq -r .name`
+    NAME=`yq read Chart.yaml -j | jq -r .name`
+    REGISTRYNAME=helm-$NAME
     VERSION=`yq read Chart.yaml -j | jq -r .version`
-    NAMESPACE=`yq read Chart.yaml -j | jq -r .namespace`
     REGISTRY=`yq read Chart.yaml -j | jq -r -e .registry`
     if [ $? -ne 0 ];
     then
@@ -19,8 +19,8 @@ function push {
         local TAG=$GIT_LOCAL_BRANCH
     fi
 
-    local FULLVERSIONNAME=$REGISTRY/$NAME:$VERSION
-    local FULLLATESTNAME=$REGISTRY/$NAME:$TAG
+    local FULLVERSIONNAME=$REGISTRY/$REGISTRYNAME:$VERSION
+    local FULLLATESTNAME=$REGISTRY/$REGISTRYNAME:$TAG
 
     helm chart save . "$FULLVERSIONNAME"
     helm chart save . "$FULLLATESTNAME"
@@ -29,10 +29,20 @@ function push {
     helm chart push "$FULLLATESTNAME"
 }
 
+
 function upgrade {
     if [[ $GIT_LOCAL_BRANCH == "main" || $GIT_LOCAL_BRANCH == "autoupdate" ]];
     then
-        GetChartInfo       
-        helm upgrade -n "$NAMESPACE" "$NAME" .
+        GetChartInfo
+
+        local DEPLOYMENT=`helm list -A -o json  -f "$NAME" | jq`
+        local DEPLOYED_VERSION=`echo $DEPLOYMENT | jq -r '.app_version'`
+        local TARGETNAME=`echo $DEPLOYMENT | jq -r '.name'`
+        local TARGETNAMESPACE=`echo $DEPLOYMENT | jq -r '.namespace'`
+        
+        if [ $DEPLOYED_VERSION == $VERSION ];
+        then
+            helm upgrade --install --force -n "$TARGETNAMESPACE" "$TARGETNAME" .
+        fi
     fi
 }
