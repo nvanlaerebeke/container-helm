@@ -2,9 +2,8 @@ function GetChartInfo {
     NAME=helm-`yq read Chart.yaml -j | jq -r .name`
     VERSION=`yq read Chart.yaml -j | jq -r .version`
     NAMESPACE=`yq read Chart.yaml -j | jq -r .namespace`
-    REGISTRY=`yq read Chart.yaml -j | jq -r .registry`
-
-    if [ -z "$REGISTRY" ];
+    REGISTRY=`yq read Chart.yaml -j | jq -r -e .registry`
+    if [[ $? -ne 0 ];
     then
         REGISTRY=registry.crazyzone.be
     fi
