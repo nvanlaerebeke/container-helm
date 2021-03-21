@@ -2,7 +2,7 @@
 
 export HELM_EXPERIMENTAL_OCI=1
 
-. function.sh
+source /functions.sh
 
 case $1 in
 push)
