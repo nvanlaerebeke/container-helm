@@ -6,7 +6,6 @@ kind: Pod
 metadata:
   name: kaniko
 spec:
-  serviceAccountName: jenkins
   volumes:
     - name: kaniko-cache
       nfs: 
