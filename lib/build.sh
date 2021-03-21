@@ -11,8 +11,11 @@ push)
 upgrade)
   upgrade "$2"
   ;;
+release)
+  release "$2" "$3"
+  ;;
 *)
-    echo "Please provide an action (push/upgrade)"
+    echo "Please provide an action (push/upgrade/release)"
     exit 1
   ;;
 esac

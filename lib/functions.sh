@@ -74,3 +74,7 @@ function upgrade {
         return;
     fi
 }
+
+function release {
+    sleep infinity
+}
