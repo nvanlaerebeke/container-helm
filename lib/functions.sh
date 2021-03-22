@@ -75,6 +75,10 @@ function upgrade {
     fi
 }
 
+function install {
+    
+}
+
 function release {
     sleep infinity
 }
