@@ -28,12 +28,13 @@ spec:
   }
   stages {
     stage('build') {
-      steps {     
+      steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh '''#!/busybox/sh 
 NAME=helm
-REGISTRY=registry.crazyzone.be
 VERSION=`cat VERSION`
+REGISTRY=registry.crazyzone.be
+REGISTRY_MIRROR=registry-mirror.crazyzone.be
 
 if [[ $GIT_LOCAL_BRANCH == "main" || $GIT_LOCAL_BRANCH == "master" ]];
 then
@@ -41,7 +42,7 @@ then
 else
   TAG=$GIT_LOCAL_BRANCH
 fi
-/kaniko/executor --dockerfile Dockerfile --context `pwd`/ --verbosity debug --destination $REPO/$NAME:$TAG --destination $REPO/$NAME:$VERSION --cache=true --cache-repo $REPO/cache
+/kaniko/executor --dockerfile Dockerfile --context `pwd`/ --verbosity debug --destination $REGISTRY/$NAME:$TAG --destination $REGISTRY/$NAME:$VERSION --cache=true --cache-repo $REGISTRY/cache --registry-mirror $REGISTRY_MIRROR
             '''
         }
       }
