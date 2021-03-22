@@ -76,7 +76,7 @@ function upgrade {
 }
 
 function install {
-    
+    helm_install_from_registry "$1" "$2"
 }
 
 function release {
