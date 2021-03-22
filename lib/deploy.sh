@@ -4,7 +4,6 @@ function helm_wait_till_ready_registry {
     local NAMESPACE=$3
 
     # full list: unknown, deployed, uninstalled, superseded, failed, uninstalling, pending-install, pending-upgrade or pending-rollback
-    local DONE_STATUS=( "unknown" "deployed" "failed")
     local STATUS=`helm status "$CHART_NAME" -n $NAMESPACE -o json | jq -r .info.status`
     
     #unable to get status
@@ -16,7 +15,7 @@ function helm_wait_till_ready_registry {
         return
     fi
 
-    if [[ ! " ${DONE_STATUS[@]} " =~ " ${STATUS} " ]]; then
+    if [[ "$STATUS" != "unknown" && "$STATUS" != "deployed" && "$STATUS" != "failed" ]]; then
         sleep 1
         helm_wait_till_ready_registry "$CHART_NAME" "$NAME" "$3"
         return
