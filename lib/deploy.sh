@@ -11,13 +11,13 @@ function helm_wait_till_ready_registry {
     then
         echo "Unable to get status"
         sleep 5
-        helm_wait_till_ready_registry "$1" "$2" "$3"
+        helm_wait_till_ready_registry "$CHART_NAME" "$NAME" "$NAMESPACE"
         return
     fi
 
     if [[ "$STATUS" != "unknown" && "$STATUS" != "deployed" && "$STATUS" != "failed" ]]; then
         sleep 1
-        helm_wait_till_ready_registry "$CHART_NAME" "$NAME" "$3"
+        helm_wait_till_ready_registry "$CHART_NAME" "$NAME" "$NAMESPACE"
         return
     fi
 
