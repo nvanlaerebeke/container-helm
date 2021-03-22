@@ -61,10 +61,10 @@ function helm_install_from_registry {
     helm chart pull registry.crazyzone.be/$NAME:latest
     helm chart export registry.crazyzone.be/$NAME:latest > /dev/null 2>&1
     
-    local CHART_NAME=`cat */Chart.yaml | yq eval -j | jq -r .name`
+    local CHART_NAME=`cat */Chart.yaml | yq read -j | jq -r .name`
     if [ -z $NAMESPACE ]; 
     then
-        local NAMESPACE=`cat */values.yaml | yq eval -j | jq -r .namespace`
+        local NAMESPACE=`cat */values.yaml | yq read -j | jq -r .namespace`
     fi
     local EXISTS=`helm list -n $NAMESPACE -o json | jq '.[] | select(.name == "'$CHART_NAME'")'`
     if [ ! -z "$EXISTS" ];
